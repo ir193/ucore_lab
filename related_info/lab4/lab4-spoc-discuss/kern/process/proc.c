@@ -70,6 +70,10 @@ struct proc_struct *initproc3 = NULL;
 // current proc
 struct proc_struct *current = NULL;
 
+struct proc_struct mem_struct[10] ;
+char mem_stack[10][KSTACKSIZE] ;
+
+static int nr_proc_created = 0;
 static int nr_process = 0;
 
 void kernel_thread_entry(void);
@@ -79,7 +83,10 @@ void switch_to(struct context *from, struct context *to);
 // alloc_proc - alloc a proc_struct and init all fields of proc_struct
 static struct proc_struct *
 alloc_proc(void) {
-    struct proc_struct *proc = kmalloc(sizeof(struct proc_struct));
+    //struct proc_struct *proc = kmalloc(sizeof(struct proc_struct));
+    nr_proc_created ++;
+    struct proc_struct *proc = &(mem_struct[nr_proc_created]);
+    
     if (proc != NULL) {
     //LAB4:EXERCISE1 2012011346
     /*
@@ -215,18 +222,21 @@ kernel_thread(int (*fn)(void *), void *arg, uint32_t clone_flags) {
 // setup_kstack - alloc pages with size KSTACKPAGE as process kernel stack
 static int
 setup_kstack(struct proc_struct *proc) {
+    /*
     struct Page *page = alloc_pages(KSTACKPAGE);
     if (page != NULL) {
         proc->kstack = (uintptr_t)page2kva(page);
         return 0;
     }
     return -E_NO_MEM;
+    */
+    proc->kstack = mem_stack[nr_proc_created];
 }
 
 // put_kstack - free the memory space of process kernel stack
 static void
 put_kstack(struct proc_struct *proc) {
-    free_pages(kva2page((void *)(proc->kstack)), KSTACKPAGE);
+    //free_pages(kva2page((void *)(proc->kstack)), KSTACKPAGE);
 }
 
 

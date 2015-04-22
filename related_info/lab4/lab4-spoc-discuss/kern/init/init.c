@@ -25,12 +25,12 @@ kern_init(void) {
     cprintf("%s\n\n", message);
 
     print_kerninfo();
-    pmm_init();                 // init physical memory management
+    //pmm_init();                 // init physical memory management
     pic_init();                 // init interrupt controller
-    idt_init();                 // init interrupt descriptor table
+    //idt_init();                 // init interrupt descriptor table
     proc_init();                // init process table
-    clock_init();               // init clock interrupt
-    intr_enable();              // enable irq interrupt
+    //clock_init();               // init clock interrupt
+    //intr_enable();              // enable irq interrupt
 
     cprintf("[SPOC] schedule after proc_init. This will let idel_proc run\n");
 	schedule();   //let init proc run
