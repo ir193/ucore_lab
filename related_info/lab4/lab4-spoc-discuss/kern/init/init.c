@@ -7,7 +7,7 @@
 #include <trap.h>
 #include <clock.h>
 #include <intr.h>
-#include <pmm.h>
+//#include <pmm.h>
 #include <proc.h>
 #include <kmonitor.h>
 

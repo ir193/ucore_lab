@@ -1,8 +1,8 @@
 #include <proc.h>
-#include <kmalloc.h>
+//#include <kmalloc.h>
 #include <string.h>
 #include <sync.h>
-#include <pmm.h>
+//#include <pmm.h>
 #include <error.h>
 #include <sched.h>
 #include <elf.h>
@@ -11,6 +11,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+
+#define CLONE_VM            0x00000100
+extern char bootstack[];
+
+
 
 /* ------------- process/thread mechanism design&implementation -------------
 (an simplified Linux process/thread mechanism )
@@ -107,7 +112,7 @@ alloc_proc(void) {
         memset(proc, 0, sizeof(struct proc_struct));
         proc->state = PROC_UNINIT;
         proc->pid = -1;
-        proc->cr3 = boot_cr3;
+        //proc->cr3 = boot_cr3;
     }
     return proc;
 }
@@ -172,8 +177,8 @@ proc_run(struct proc_struct *proc) {
         local_intr_save(intr_flag);
         {
             current = proc;
-            load_esp0(next->kstack + KSTACKSIZE);
-            lcr3(next->cr3);
+            //load_esp0(next->kstack + KSTACKSIZE);
+            //lcr3(next->cr3);
             switch_to(&(prev->context), &(next->context));
         }
         local_intr_restore(intr_flag);
@@ -207,6 +212,7 @@ find_proc(int pid) {
 // kernel_thread - create a kernel thread using "fn" function
 // NOTE: the contents of temp trapframe tf will be copied to 
 //       proc->tf in do_fork-->copy_thread function
+
 int
 kernel_thread(int (*fn)(void *), void *arg, uint32_t clone_flags) {
     struct trapframe tf;
@@ -230,7 +236,13 @@ setup_kstack(struct proc_struct *proc) {
     }
     return -E_NO_MEM;
     */
-    proc->kstack = mem_stack[nr_proc_created];
+    if(nr_proc_created < 10){
+        proc->kstack = (uintptr_t) mem_stack[nr_proc_created];
+        return 0;
+    }
+    else{
+        return -E_NO_MEM;
+    }
 }
 
 // put_kstack - free the memory space of process kernel stack
@@ -306,7 +318,7 @@ fork_out:
 bad_fork_cleanup_kstack:
     put_kstack(proc);
 bad_fork_cleanup_proc:
-    kfree(proc);
+    //kfree(proc);
     goto fork_out;
 }
 
@@ -359,7 +371,7 @@ found:
     }
     local_intr_restore(intr_flag);
     put_kstack(proc);
-    kfree(proc);
+    //kfree(proc);
     return 0;
 }
 
@@ -411,7 +423,7 @@ init_main(void *arg) {
 //           - create the second kernel thread init_main
 void
 proc_init(void) {
-    int i;
+    //int i;
 
     list_init(&proc_list);
 
