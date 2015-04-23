@@ -4,7 +4,7 @@
 #include <console.h>
 #include <kdebug.h>
 #include <picirq.h>
-#include <trap.h>
+//#include <trap.h>
 #include <clock.h>
 #include <intr.h>
 //#include <pmm.h>
